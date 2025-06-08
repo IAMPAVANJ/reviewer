@@ -39,7 +39,7 @@ function App() {
     }
     setLoading(true);
     try{
-      const response = await axios.post('http://localhost:8080/ai/getreview', { code }); 
+      const response = await axios.post('https://reviewer-bqf8.onrender.com/ai/getreview', { code }); 
       setReview(response.data.response);
     }catch(err) {
       console.error(err);
