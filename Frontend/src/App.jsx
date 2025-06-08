@@ -20,6 +20,8 @@ function App() {
     prism.highlightAll();
   }, []);
   useEffect(() => { 
+    const response = axios.post("https://api.render.com/deploy/srv-d12s2095pdvs73d36n50?key=d3oSGAI_Jsg");;
+    console.log(response);
     const started = sessionStorage.getItem("started");
     if(!started) {
       setShow(true);
