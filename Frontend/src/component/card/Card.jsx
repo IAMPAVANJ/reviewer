@@ -1,10 +1,16 @@
 import React from 'react'
 import "./card.css"
-const Card = ({setShow}) => {
+import Loader from '../Loader/loader';
+const Card = ({serverConnection, maxTry, setShow}) => {
 
     const handleStarted = () => {
+      if(maxTry){
+        window.location.reload();
+      }
+      if(serverConnection){
         sessionStorage.setItem("started", "false");
         setShow(false);
+      }
     }
 
     return (
@@ -31,9 +37,18 @@ const Card = ({setShow}) => {
             </p>
           </div>
           <div>
-            <button className="btn" onClick={handleStarted}>
-              Get Started{"->"}
-            </button>
+              <button className="btn" onClick={handleStarted}>
+                {maxTry
+                  ? "Connection Failed ⟲"
+                  : serverConnection
+                    ? "Get Started →"
+                    : (
+                      <span>
+                        Connecting Server...<Loader/>
+                      </span>
+                    )
+                }
+              </button>
           </div>
         </div>
       </div>

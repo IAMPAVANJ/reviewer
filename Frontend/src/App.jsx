@@ -11,7 +11,9 @@ import "highlight.js/styles/github-dark.css";
 import Loader from './component/Loader/loader';
 import Card from './component/card/Card';
 import InstructionCard from './component/InstructionCard/InstructionCard';
+import useServerConnection from './Hooks/useServerConnection';
 function App() {
+  const {serverConnection,maxTry} = useServerConnection();
   const [loading, setLoading] = useState(false);
   const [code,setCode] = useState("");
   const [show, setShow] = useState(false);
@@ -19,9 +21,8 @@ function App() {
   useEffect (() => {
     prism.highlightAll();
   }, []);
+
   useEffect(() => { 
-    const response = axios.post("https://api.render.com/deploy/srv-d12s2095pdvs73d36n50?key=d3oSGAI_Jsg");
-    console.log(response);
     const started = sessionStorage.getItem("started");
     if(!started) {
       setShow(true);
@@ -33,7 +34,7 @@ function App() {
     }) 
   },[])
 
-  const reviewCode = async(e)=> {
+  const reviewCode = async(e,count=1)=> {
     e.preventDefault();
     if(!code.trim()) {
       toast.error("Please enter some code to review.");
@@ -44,8 +45,13 @@ function App() {
       const response = await axios.post('https://reviewer-bqf8.onrender.com/ai/getreview', { code }); 
       setReview(response.data.response);
     }catch(err) {
-      console.error(err);
-      toast.error("An error occurred while reviewing the code.");
+      if(count<=3){
+        count++;
+        reviewCode(e,count);
+      }else{
+        console.error(err);
+        toast.error("An error occurred while reviewing the code.");
+      }
     }finally{
       setLoading(false);
     }
@@ -57,7 +63,7 @@ function App() {
       <div className='left'>
         <div className='code'>
           <Editor
-          disabled={loading}
+          disabled={loading || serverConnection===false}
             value={code}
             onValueChange={setCode}
             highlight={code => prism.highlight(code, prism.languages.javascript, 'javascript')}
@@ -82,7 +88,7 @@ function App() {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-        {show && <Card setShow={setShow}/>}
+        {show && <Card serverConnection={serverConnection} maxTry={maxTry} setShow={setShow}/>}
         
              {review=="" && !show ? <InstructionCard/> : <MarkDown
               rehypePlugins={[rehypeHighlight]}
@@ -92,10 +98,10 @@ function App() {
       </div>
     </main>
     <Toaster position="top-center"
-  reverseOrder={false}
-  toastOptions={{
-    duration:1500,
-  }}
+    reverseOrder={false}
+    toastOptions={{
+      duration:2000,
+    }}
   />
     </>
   )

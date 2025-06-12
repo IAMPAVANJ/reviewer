@@ -8,8 +8,8 @@ app.use(cors());
 app.use(express.json());
 app.use('/ai', AiRoutes);
 
-app.get("/",(req, res) => {
-  res.send("Hello World!");
+app.get("/connection",(req, res) => {
+  res.status(200).json({connection:true});
 });
 
 module.exports = app;
